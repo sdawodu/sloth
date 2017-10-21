@@ -8,10 +8,13 @@ from django.contrib.auth.models import User
 class Exercise(models.Model):
     name = models.CharField(max_length=256)
     notes = models.TextField(blank=True, null=True)
-    video_link = models.URLField()
+    video_link = models.URLField(blank=True, null=True)
 
     # Assume every exercise is done for reps unless otherwise stated
     is_timed = models.BooleanField()
+
+    def __str__(self):
+        return self.name
 
 
 class Plan(models.Model):
@@ -28,6 +31,9 @@ class Plan(models.Model):
         max_length=12
     )
 
+    def __str__(self):
+        return self.name
+
 
 class Phase(models.Model):
     name = models.CharField(max_length=64)
@@ -40,6 +46,9 @@ class Phase(models.Model):
     # To Do:
     # - Add some methods to assess success of phase
 
+    def __str__(self):
+        return self.name
+
 
 class Period(models.Model):
     name = models.CharField(max_length=64)
@@ -49,11 +58,17 @@ class Period(models.Model):
     length = models.IntegerField(default=7)
     phase = models.ForeignKey(Phase)
 
+    def __str__(self):
+        return self.name
+
 
 class Workout(models.Model):
     name = models.CharField(max_length=256)
     notes = models.TextField()
     period = models.ForeignKey(Period)
+
+    def __str__(self):
+        return self.name
 
 
 class Set(models.Model):
@@ -66,3 +81,6 @@ class Set(models.Model):
     reps_done = models.IntegerField()
     time_done = models.TimeField()
     workout = models.ForeignKey(Workout)
+
+    def __str__(self):
+        return "{0}:{1}".format(self.exercise, self.reps or self.time)
