@@ -17,8 +17,26 @@ class Exercise(models.Model):
         return self.name
 
 
+class Person(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
+    role = models.CharField(
+        choices=[
+            ('trainer', 'trainer'),
+            ('trainee', 'trainee')
+        ],
+        max_length=7
+    )
+    trainer = models.ForeignKey('Person', blank=True, null=True)
+
+    def __str__(self):
+        return str(self.user)
+
+
 class Plan(models.Model):
-    user = models.ForeignKey(User, blank=True, null=True)
+    trainee = models.ForeignKey(Person, blank=True, null=True)
     goals = models.TextField()
     is_active = models.BooleanField()
     status = models.CharField(
@@ -32,7 +50,7 @@ class Plan(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return "{}:{}".format(self.trainee, self.status)
 
 
 class Phase(models.Model):
@@ -66,6 +84,7 @@ class Workout(models.Model):
     name = models.CharField(max_length=256)
     notes = models.TextField()
     period = models.ForeignKey(Period)
+    sets = models.ManyToManyField('Set')
 
     def __str__(self):
         return self.name
@@ -73,14 +92,14 @@ class Workout(models.Model):
 
 class Set(models.Model):
     exercise = models.ForeignKey(Exercise)
-    reps = models.IntegerField()
-    time = models.TimeField()
+    reps = models.IntegerField(blank=True, null=True)
+    time = models.IntegerField(blank=True, null=True)
     is_amrap = models.BooleanField()
     is_complete = models.BooleanField()
 
-    reps_done = models.IntegerField()
-    time_done = models.TimeField()
-    workout = models.ForeignKey(Workout)
+    reps_done = models.IntegerField(blank=True, null=True)
+    time_done = models.TimeField(blank=True, null=True)
+    # workout = models.ForeignKey(Workout)
 
     def __str__(self):
         return "{0}:{1}".format(self.exercise, self.reps or self.time)
